@@ -4,6 +4,7 @@ import requests
 import json
 import random
 from replit import db
+from imgurpython import ImgurClient
 
 intents = discord.Intents().all()
 client = discord.Client(intents=intents);
@@ -18,10 +19,10 @@ starter_encouragements = [
 
 starter_vagabond = [
   "Be aware of yourself, and accept yourself as you are. - Takuan Sōhō",
-  "Preoccupied with a single leaf, you won't see the tree. Preoccupied with a single tree,       you'll miss the entire forest. - Takuan Sōhō",
+  "Preoccupied with a single leaf, you won't see the tree. Preoccupied with a single tree, you'll miss the entire forest. - Takuan Sōhō",
   "The more one tries to look away, the more one gets preoccupied. - Takuan Sōhō",
   "See everything in its entirety, effortlessly. - Takuan Sōhō",
-  "So many things in this world cannot be expressed with words. Some things can not be explained, they must be experienced. - Inei Hozoin"
+  "So many things in this world cannot be expressed with words. Some things cannot be explained, they must be experienced. - Inei Hozoin"
 ]
 
 if "responding" not in db.keys():
@@ -54,6 +55,12 @@ def delete_encouragement(index):
   if len(encouragements) > index:
     del encouragements[index]
     db["encouragements"] = encouragements 
+
+def delete_vagabond(index):
+  quotes = db["quotes"]
+  if len(quotes) > index:
+    del quotes[index]
+    db["encouragements"] = quotes 
 
 @client.event
 async def on_ready():
@@ -88,7 +95,7 @@ async def on_message(message):
     await message.channel.send("New insight has been added.")
 
   if msg.startswith("$vnew"):
-    vagabond_quote = msg.split("$newv ", 1)[1]
+    vagabond_quote = msg.split("$vnew ", 1)[1]
     update_vagabond(vagabond_quote)
     await message.channel.send("New quote has been added.")
 
@@ -100,11 +107,32 @@ async def on_message(message):
       encouragements = db["encouragements"]
     await message.channel.send(encouragements.value)
 
+  if msg.startswith("$vdel"):
+    if "quotes" in db.keys():
+      index = int(msg.split("$vdel",1)[1])
+      delete_vagabond(index)
+      quotes = db["quotes"]
+    await message.channel.send("Quote has been deleted.")
+
   if msg.startswith("$list"):
-    encouragements = []
-    if "encouragements" in db.keys():
-      encouragements = db["encouragements"]
-    await message.channel.send(encouragements.value)
+    list = "```"
+    index = 0
+    for i in db["encouragements"]:
+      index += 1
+      list += "Insight #" + str(index) + ": - " + i + "\n"
+    await message.channel.send(list + "```")
+
+  if msg.startswith("$vlist"):
+    vquotes = "```"
+    vuserq = ""
+    index = 0
+    for i in starter_vagabond:
+      index += 1
+      vquotes += "Quote #" + str(index) + ": - " + i + "\n"
+    for quotes in db["quotes"]:
+      index += 1
+      vuserq += "Quote #" + str(index) + ": - " + quotes + "\n"
+    await message.channel.send(vquotes + vuserq + "```")
 
   if msg.startswith("$responding"):
     value = msg.split("$responding ",1)[1]
@@ -117,4 +145,3 @@ async def on_message(message):
       await message.channel.send("Responding is off.")
       
 client.run(os.getenv('TOKEN'))
-

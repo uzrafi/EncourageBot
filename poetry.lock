@@ -214,6 +214,17 @@ optional = false
 python-versions = ">=3.5"
 
 [[package]]
+name = "imgurpython"
+version = "1.1.7"
+description = "Official Imgur python library with OAuth2 and samples"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+requests = "*"
+
+[[package]]
 name = "importlib-metadata"
 version = "5.2.0"
 description = "Read metadata from Python packages"
@@ -430,7 +441,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "18f8a11d3b99b08d976e2e01d693d9187c90be5e9015182f1057979dff415fd9"
+content-hash = "2810c2ff4ccbdd6ed6e366a70b37a29c94aab961f0318abed931791b95c5e1b4"
 
 [metadata.files]
 aiohttp = []
@@ -450,6 +461,7 @@ discord = []
 flask = []
 frozenlist = []
 idna = []
+imgurpython = []
 importlib-metadata = []
 iso8601 = []
 itsdangerous = []
