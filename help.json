@@ -1,0 +1,17 @@
+{
+
+  "Vagabond Commands:" : {
+    "vagabond" : "Get a quote from the manga Vagabond",
+    "vnew" : "Add a new Vagabond quote",
+    "vlist" : "Lists all Vagabond quotes",
+    "vdel" : "Delete a Vagabond quote (Quotes 1-5 cannot be deleted!)",
+    "vpanel" : "Get a panel from the manga Vagabond" 
+  },
+  "Insight Commands:" : {
+    "insight" : "Get insight from a philosopher/notable figure",
+    "responding" : "Set the response state of the bot to 'true' or 'false'",
+    "inew" : "Add a new insight",
+    "idel" : "Delete an insight",
+    "ilist" : "Lists all insights",
+  }
+}

@@ -1,5 +1,6 @@
 import discord
 import os
+from discord.ext import commands
 import requests
 import json
 import random
@@ -7,9 +8,21 @@ from replit import db
 from imgurpython import ImgurClient
 
 intents = discord.Intents().all()
-client = discord.Client(intents=intents);
 
-sad_words = ["sad", "pain", "depressed", "unhappy", "angry", "miserable", "depressing", "hate school"]
+client_id = os.getenv('CLIENT_ID')
+client_secret = os.getenv('CLIENT_SEC')
+
+imgurClient = ImgurClient(client_id, client_secret)
+
+bot = commands.Bot(command_prefix=".", intents=intents)
+bot.remove_command('help')
+
+help_guide = json.load(open("help.json"))
+
+sad_words = [
+  "sad", "pain", "depressed", "unhappy", "angry", "miserable", "depressing",
+  "hate school"
+]
 
 starter_encouragements = [
   "Do not falter, you are on the path to victory.",
@@ -28,120 +41,171 @@ starter_vagabond = [
 if "responding" not in db.keys():
   db["responding"] = True
 
+
 def get_quote():
   response = requests.get("https://zenquotes.io/api/random")
   json_data = json.loads(response.text)
   quote = json_data[0]['q'] + " - " + json_data[0]['a']
-  return(quote)
+  return (quote)
+
 
 def update_encouragements(encouraging_message):
-  if "encouragements" in db.keys(): # if there are encouragements in database
+  if "encouragements" in db.keys():  # if there are encouragements in database
     encouragements = db["encouragements"]
     encouragements.append(encouraging_message)
     db["encouragements"] = encouragements
   else:
     db["encouragements"] = [encouraging_message]
 
+
 def update_vagabond(vagabond_quote):
-  if "quotes" in db.keys(): # if there are quotes in database
+  if "quotes" in db.keys():  # if there are quotes in database
     quotes = db["quotes"]
     quotes.append(vagabond_quote)
     db["quotes"] = quotes
   else:
     db["quotes"] = [vagabond_quote]
 
+
 def delete_encouragement(index):
   encouragements = db["encouragements"]
   if len(encouragements) > index:
     del encouragements[index]
-    db["encouragements"] = encouragements 
+    db["encouragements"] = encouragements
+
 
 def delete_vagabond(index):
   quotes = db["quotes"]
   if len(quotes) > index:
     del quotes[index]
-    db["encouragements"] = quotes 
+    db["quotes"] = quotes
 
-@client.event
+
+@bot.event
 async def on_ready():
-  print('We have logged in as {0.user}'.format(client))
+  print('We have logged in as {0.user}'.format(bot))
 
-@client.event
+
+@bot.event
 async def on_message(message):
   msg = message.content
   user = message.author
-  
-  if user == client.user:
-    return
-    
-  if msg.startswith('$insight'):
-    quote = get_quote()
-    await message.channel.send(user.mention + " " + quote)
 
-  if msg.startswith('$vagabond'):
-    await message.channel.send(random.choice(starter_vagabond))
+  if user == bot.user:
+    return
 
   if db["responding"]:
     options = starter_encouragements
     if "encouragements" in db.keys():
       options = options + db["encouragements"].value
-  
+
     if any(word in msg for word in sad_words):
       await message.channel.send(user.mention + " " + random.choice(options))
 
-  if msg.startswith("$new"):
-    encouraging_message = msg.split("$new ", 1)[1]
-    update_encouragements(encouraging_message)
-    await message.channel.send("New insight has been added.")
+  await bot.process_commands(message)
 
-  if msg.startswith("$vnew"):
-    vagabond_quote = msg.split("$vnew ", 1)[1]
-    update_vagabond(vagabond_quote)
-    await message.channel.send("New quote has been added.")
 
-  if msg.startswith("$del"):
-    encouragements = []
-    if "encouragements" in db.keys():
-      index = int(msg.split("$del",1)[1])
-      delete_encouragement(index)
-      encouragements = db["encouragements"]
-    await message.channel.send(encouragements.value)
+@bot.command()
+async def insight(ctx):
+  quote = get_quote()
+  await ctx.send(ctx.author.mention + " " + quote)
 
-  if msg.startswith("$vdel"):
-    if "quotes" in db.keys():
-      index = int(msg.split("$vdel",1)[1])
-      delete_vagabond(index)
-      quotes = db["quotes"]
-    await message.channel.send("Quote has been deleted.")
 
-  if msg.startswith("$list"):
-    list = "```"
-    index = 0
-    for i in db["encouragements"]:
-      index += 1
-      list += "Insight #" + str(index) + ": - " + i + "\n"
-    await message.channel.send(list + "```")
+@bot.command()
+async def vagabond(ctx):
+  await ctx.send(random.choice(starter_vagabond))
 
-  if msg.startswith("$vlist"):
-    vquotes = "```"
-    vuserq = ""
-    index = 0
-    for i in starter_vagabond:
-      index += 1
-      vquotes += "Quote #" + str(index) + ": - " + i + "\n"
-    for quotes in db["quotes"]:
-      index += 1
-      vuserq += "Quote #" + str(index) + ": - " + quotes + "\n"
-    await message.channel.send(vquotes + vuserq + "```")
 
-  if msg.startswith("$responding"):
-    value = msg.split("$responding ",1)[1]
+@bot.command()
+async def responding(ctx, state):
+  if state == "true":
+    db["responding"] = True
+    await ctx.send("Responding is on.")
+  elif state == "false":
+    db["responding"] = False
+    await ctx.send("Responding is off.")
+  else:
+    await ctx.send("Responding state must be either 'true' or 'false'!")
 
-    if value.lower() == "true":
-      db["responding"] = True
-      await message.channel.send("Responding is on.")
-    else:
-      db["responding"] = False
-      await message.channel.send("Responding is off.")
-      
-client.run(os.getenv('TOKEN'))
+
+@bot.command()
+async def inew(ctx, encouraging_message):
+  encouraging_message = ctx.message.content.split(".enew ", 1)[1]
+  update_encouragements(encouraging_message)
+  await ctx.send("New insight has been added.")
+
+
+@bot.command()
+async def vnew(ctx, vagabond_quote):
+  vagabond_quote = ctx.message.content.split(".vnew ", 1)[1]
+  update_vagabond(vagabond_quote)
+  await ctx.send("New quote has been added.")
+
+
+@bot.command()
+async def idel(ctx, index):
+  if "encouragements" in db.keys():
+    delete_encouragement(int(index) - 1)
+  await ctx.send("Encouragement #" + index + " has been deleted.")
+
+
+@bot.command()
+async def vdel(ctx, index):
+  if "quotes" in db.keys():
+    delete_vagabond(int(index) - 6)
+  await ctx.send("Vagabond quote #" + index + " has been deleted.")
+
+
+@bot.command()
+async def ilist(ctx):
+  list = "```"
+  index = 0
+  for i in db["encouragements"]:
+    index += 1
+    list += "Insight #" + str(index) + ": - " + i + "\n"
+  await ctx.send(list + "```")
+
+
+@bot.command()
+async def vlist(ctx):
+  vquotes = "```"
+  vuserq = ""
+  index = 0
+  for i in starter_vagabond:
+    index += 1
+    vquotes += "Quote #" + str(index) + ": - " + i + "\n"
+  for quotes in db["quotes"]:
+    index += 1
+    vuserq += "Quote #" + str(index) + ": - " + quotes + "\n"
+  await ctx.send(vquotes + vuserq + "```")
+
+
+@bot.command()
+async def vpanel(ctx, vagabond_quote):
+  return
+
+def createHelpEmbed(page_num=0, inline=False):
+  page_title = list(help_guide)[page_num]
+  e= discord.Embed(color=discord.Color.blurple, title=page_title)
+  for key, val in help_guide[page_title].items():
+    e.add_field(name=bot.command_prefix+key, value=val, inline=inline)
+    
+
+@bot.command()
+async def help(ctx):
+  e = discord.Embed(color=discord.Color.blurple(), title="Command List")
+  e.add_field(name="insight",
+              value="Get insight from various philosphers :",
+              inline=False)
+  e.add_field(name="insight",
+              value="Get insight from various philosphers :",
+              inline=False)
+  e.add_field(name="insight",
+              value="Get insight from various philosphers :",
+              inline=False)
+  e.add_field(name="insight",
+              value="Get insight from various philosphers :",
+              inline=False)
+  await ctx.send(embed=e)
+
+bot.run(os.getenv('TOKEN'))
