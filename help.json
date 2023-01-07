@@ -12,6 +12,6 @@
     "responding" : "Set the response state of the bot to 'true' or 'false'",
     "inew" : "Add a new insight",
     "idel" : "Delete an insight",
-    "ilist" : "Lists all insights",
+    "ilist" : "List all insights"
   }
 }

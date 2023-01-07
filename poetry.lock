@@ -61,6 +61,14 @@ dev = ["pytest", "cogapp", "pre-commit", "wheel"]
 tests = ["pytest"]
 
 [[package]]
+name = "async-generator"
+version = "1.10"
+description = "Async generators and context managers for Python 3.5+"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "async-timeout"
 version = "4.0.2"
 description = "Timeout context manager for asyncio programs"
@@ -179,6 +187,17 @@ test = ["coverage", "pytest", "pytest-asyncio", "pytest-cov", "pytest-mock", "ty
 voice = ["PyNaCl (>=1.3.0,<1.6)"]
 
 [[package]]
+name = "exceptiongroup"
+version = "1.1.0"
+description = "Backport of PEP 654 (exception groups)"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.extras]
+test = ["pytest (>=6)"]
+
+[[package]]
 name = "flask"
 version = "2.2.2"
 description = "A simple framework for building complex web applications."
@@ -204,6 +223,22 @@ description = "A list-like structure which implements collections.abc.MutableSeq
 category = "main"
 optional = false
 python-versions = ">=3.7"
+
+[[package]]
+name = "h11"
+version = "0.14.0"
+description = "A pure-Python, bring-your-own-I/O implementation of HTTP/1.1"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
+name = "helpers"
+version = "0.2.0"
+description = "Improved developer experience, accumulated."
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "idna"
@@ -287,6 +322,17 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "outcome"
+version = "1.2.0"
+description = "Capture the outcome of Python function calls."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+attrs = ">=19.2.0"
+
+[[package]]
 name = "passlib"
 version = "1.7.4"
 description = "comprehensive password hashing framework supporting over 30 schemes"
@@ -345,6 +391,14 @@ pycryptodomex = ">=3.12.0,<4.0.0"
 docs = ["Sphinx[docs] (>=4.3.2,<6.0.0)", "sphinx-autodoc-typehints[docs] (==1.12.0)", "sphinx-rtd-theme[docs] (>=1.0.0,<2.0.0)"]
 
 [[package]]
+name = "pysocks"
+version = "1.7.1"
+description = "A Python SOCKS client module. See https://github.com/Anorov/PySocks for more information."
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[[package]]
 name = "replit"
 version = "3.2.5"
 description = "A library for interacting with features of repl.it"
@@ -380,6 +434,67 @@ socks = ["PySocks (>=1.5.6,!=1.5.7)"]
 use_chardet_on_py3 = ["chardet (>=3.0.2,<6)"]
 
 [[package]]
+name = "selenium"
+version = "4.7.2"
+description = ""
+category = "main"
+optional = false
+python-versions = "~=3.7"
+
+[package.dependencies]
+certifi = ">=2021.10.8"
+trio = ">=0.17,<1.0"
+trio-websocket = ">=0.9,<1.0"
+urllib3 = {version = ">=1.26,<2.0", extras = ["socks"]}
+
+[[package]]
+name = "sniffio"
+version = "1.3.0"
+description = "Sniff out which async library your code is running under"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
+name = "sortedcontainers"
+version = "2.4.0"
+description = "Sorted Containers -- Sorted List, Sorted Dict, Sorted Set"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "trio"
+version = "0.22.0"
+description = "A friendly Python library for async concurrency and I/O"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+async-generator = ">=1.9"
+attrs = ">=19.2.0"
+cffi = {version = ">=1.14", markers = "os_name == \"nt\" and implementation_name != \"pypy\""}
+exceptiongroup = {version = ">=1.0.0rc9", markers = "python_version < \"3.11\""}
+idna = "*"
+outcome = "*"
+sniffio = "*"
+sortedcontainers = "*"
+
+[[package]]
+name = "trio-websocket"
+version = "0.9.2"
+description = "WebSocket library for Trio"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.dependencies]
+async-generator = ">=1.10"
+trio = ">=0.11"
+wsproto = ">=0.14"
+
+[[package]]
 name = "typing-extensions"
 version = "3.10.0.2"
 description = "Backported and Experimental Type Hints for Python 3.5+"
@@ -394,6 +509,9 @@ description = "HTTP library with thread-safe connection pooling, file post, and 
 category = "main"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
+
+[package.dependencies]
+PySocks = {version = ">=1.5.6,<1.5.7 || >1.5.7,<2.0", optional = true, markers = "extra == \"socks\""}
 
 [package.extras]
 brotli = ["brotlicffi (>=0.8.0)", "brotli (>=1.0.9)", "brotlipy (>=0.6.0)"]
@@ -413,6 +531,17 @@ MarkupSafe = ">=2.1.1"
 
 [package.extras]
 watchdog = ["watchdog"]
+
+[[package]]
+name = "wsproto"
+version = "1.2.0"
+description = "WebSockets state-machine based protocol implementation"
+category = "main"
+optional = false
+python-versions = ">=3.7.0"
+
+[package.dependencies]
+h11 = ">=0.9.0,<1"
 
 [[package]]
 name = "yarl"
@@ -441,13 +570,14 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "2810c2ff4ccbdd6ed6e366a70b37a29c94aab961f0318abed931791b95c5e1b4"
+content-hash = "b04485b3c9d7fd698103a03b1ec4c4616edef4c3ffeb67fe78603e0717b763a6"
 
 [metadata.files]
 aiohttp = []
 aiosignal = []
 argon2-cffi = []
 argon2-cffi-bindings = []
+async-generator = []
 async-timeout = []
 attrs = []
 certifi = []
@@ -458,8 +588,11 @@ colorama = []
 cryptography = []
 discord = []
 "discord.py" = []
+exceptiongroup = []
 flask = []
 frozenlist = []
+h11 = []
+helpers = []
 idna = []
 imgurpython = []
 importlib-metadata = []
@@ -468,15 +601,23 @@ itsdangerous = []
 jinja2 = []
 markupsafe = []
 multidict = []
+outcome = []
 passlib = []
 protobuf = []
 pycparser = []
 pycryptodomex = []
 pyseto = []
+pysocks = []
 replit = []
 requests = []
+selenium = []
+sniffio = []
+sortedcontainers = []
+trio = []
+trio-websocket = []
 typing-extensions = []
 urllib3 = []
 werkzeug = []
+wsproto = []
 yarl = []
 zipp = []

@@ -1,18 +1,18 @@
 import discord
 import os
+import random
 from discord.ext import commands
 import requests
 import json
 import random
 from replit import db
-from imgurpython import ImgurClient
+from discord.ui import Button, View
+from auth import authenticate
 
 intents = discord.Intents().all()
 
 client_id = os.getenv('CLIENT_ID')
 client_secret = os.getenv('CLIENT_SEC')
-
-imgurClient = ImgurClient(client_id, client_secret)
 
 bot = commands.Bot(command_prefix=".", intents=intents)
 bot.remove_command('help')
@@ -181,31 +181,50 @@ async def vlist(ctx):
 
 
 @bot.command()
-async def vpanel(ctx, vagabond_quote):
-  return
+async def vpanel(ctx):
+  client = authenticate()
+  links = []
+
+  for album in client.get_account_albums('me'):
+    for image in client.get_album_images(album.id):
+      links.append(image.link)
+    break
+
+  await ctx.send(random.choice(links))
+
 
 def createHelpEmbed(page_num=0, inline=False):
+  page_num = page_num % len(list(help_guide))
   page_title = list(help_guide)[page_num]
-  e= discord.Embed(color=discord.Color.blurple, title=page_title)
+  e= discord.Embed(colour=0x0e5fe3, title=page_title)
   for key, val in help_guide[page_title].items():
     e.add_field(name=bot.command_prefix+key, value=val, inline=inline)
+    e.set_footer(text=f"Page {page_num + 1} of {len(list(help_guide))}")
+  return e
     
 
 @bot.command()
 async def help(ctx):
-  e = discord.Embed(color=discord.Color.blurple(), title="Command List")
-  e.add_field(name="insight",
-              value="Get insight from various philosphers :",
-              inline=False)
-  e.add_field(name="insight",
-              value="Get insight from various philosphers :",
-              inline=False)
-  e.add_field(name="insight",
-              value="Get insight from various philosphers :",
-              inline=False)
-  e.add_field(name="insight",
-              value="Get insight from various philosphers :",
-              inline=False)
-  await ctx.send(embed=e)
+  current_page = 0
+
+  async def nextCallback(interaction):
+    nonlocal current_page, sent_msg
+    current_page += 1
+    await sent_msg.edit(embed=createHelpEmbed(page_num=current_page), view=myview)
+
+  async def previousCallback(interaction):
+    nonlocal current_page, sent_msg
+    current_page -= 1
+    await sent_msg.edit(embed=createHelpEmbed(page_num=current_page), view=myview)
+  
+  next_button = Button(label=">", style= discord.ButtonStyle.blurple)
+  next_button.callback = nextCallback
+  previous_button = Button(label="<", style= discord.ButtonStyle.blurple)
+  previous_button.callback = previousCallback
+
+  myview = View(timeout=180)
+  myview.add_item(previous_button)
+  myview.add_item(next_button)
+  sent_msg = await ctx.send(embed=createHelpEmbed(page_num=0), view=myview)
 
 bot.run(os.getenv('TOKEN'))
